@@ -1,4 +1,4 @@
-package address
+package iotaUtils
 
 import (
 	"crypto/ed25519"
