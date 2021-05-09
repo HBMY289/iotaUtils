@@ -32,9 +32,6 @@ func getPath(account, addrIndex uint32, change bool) []uint32 {
 	if change {
 		path[3] = 1
 	}
-	for i, _ := range path {
-		path[i] = hardened(path[i])
-	}
 	return path
 }
 func keyWithPath(masterKey []byte, path []uint32) []byte {
