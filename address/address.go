@@ -5,7 +5,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha512"
 	"encoding/binary"
-
 	"encoding/hex"
 
 	"github.com/btcsuite/btcutil/bech32"
@@ -29,9 +28,12 @@ func subSeed(masterKey []byte, path []uint32) []byte {
 }
 
 func getPath(account, addrIndex uint32, change bool) []uint32 {
-	path := []uint32{purpose, coinType, account, hardened(0), addrIndex}
+	path := []uint32{purpose, coinType, account, 0, addrIndex}
 	if change {
-		path[3] = hardened(1)
+		path[3] = 1
+	}
+	for i, _ := range path {
+		path[i] = hardened(path[i])
 	}
 	return path
 }
