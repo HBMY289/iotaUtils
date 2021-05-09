@@ -93,8 +93,8 @@ func uint32Bytes(i uint32) []byte {
 	return bytes
 }
 
-func GetAddress(masterKey []byte, account, addrIndex uint32, change bool) *addr {
-	a := new(addr)
+func GetAddress(masterKey []byte, account, addrIndex uint32, change bool) *Addr {
+	a := new(Addr)
 	path := getPath(account, addrIndex, change)
 	subSeed := keyWithPath(masterKey, path)[:32]
 	a.privateKey = ed25519.NewKeyFromSeed(subSeed)
@@ -104,7 +104,7 @@ func GetAddress(masterKey []byte, account, addrIndex uint32, change bool) *addr 
 	return a
 }
 
-func (a addr) Bech32(hrp string) string {
+func (a Addr) Bech32(hrp string) string {
 	conv, err := bech32.ConvertBits(append([]byte{0}, a.addrBytes...), 8, 5, true)
 	if err != nil {
 		panic(err)
@@ -116,21 +116,21 @@ func (a addr) Bech32(hrp string) string {
 	return addr
 }
 
-func (a addr) Hex() string {
+func (a Addr) Hex() string {
 	return hex.EncodeToString(a.addrBytes)
 }
 
-func (a addr) Sign(message []byte) []byte {
+func (a Addr) Sign(message []byte) []byte {
 	sig := ed25519.Sign(a.privateKey, message)
 	return sig
 
 }
 
-func (a addr) Verify(message, signature []byte) bool {
+func (a Addr) Verify(message, signature []byte) bool {
 	return ed25519.Verify(a.publicKey, message, signature)
 }
 
-type addr struct {
+type Addr struct {
 	privateKey ed25519.PrivateKey
 	publicKey  ed25519.PublicKey
 	addrBytes  []byte
