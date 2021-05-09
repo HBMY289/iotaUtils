@@ -6,6 +6,7 @@ import (
 	"crypto/sha512"
 	"encoding/binary"
 	"encoding/hex"
+	"strconv"
 
 	"github.com/btcsuite/btcutil/bech32"
 	"github.com/tyler-smith/go-bip39"
@@ -102,6 +103,7 @@ func GetAddress(masterKey []byte, account, addrIndex uint32, change bool) *Addr 
 	hash := blake2b.Sum256(a.publicKey)
 	a.addrBytes = hash[:]
 	a.change = change
+	a.index = addrIndex
 	return a
 }
 
@@ -131,8 +133,16 @@ func (a Addr) Verify(message, signature []byte) bool {
 	return ed25519.Verify(a.publicKey, message, signature)
 }
 
-func (a Addr) isChange() bool {
+func (a Addr) IsChange() bool {
 	return a.change
+}
+
+func (a Addr) verboseIndex() string {
+	index := strconv.FormatUint(uint64(a.index), 10)
+	if a.change {
+		index += "c"
+	}
+	return index
 }
 
 type Addr struct {
@@ -140,4 +150,5 @@ type Addr struct {
 	publicKey  ed25519.PublicKey
 	addrBytes  []byte
 	change     bool
+	index      uint32
 }
