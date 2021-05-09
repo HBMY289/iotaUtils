@@ -137,7 +137,7 @@ func (a Addr) IsChange() bool {
 	return a.change
 }
 
-func (a Addr) verboseIndex() string {
+func (a Addr) VerboseIndex() string {
 	index := strconv.FormatUint(uint64(a.index), 10)
 	if a.change {
 		index += "c"
