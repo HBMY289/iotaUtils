@@ -101,6 +101,7 @@ func GetAddress(masterKey []byte, account, addrIndex uint32, change bool) *Addr 
 	a.publicKey = a.privateKey.Public().(ed25519.PublicKey)
 	hash := blake2b.Sum256(a.publicKey)
 	a.addrBytes = hash[:]
+	a.change = change
 	return a
 }
 
@@ -130,8 +131,13 @@ func (a Addr) Verify(message, signature []byte) bool {
 	return ed25519.Verify(a.publicKey, message, signature)
 }
 
+func (a Addr) isChange() bool {
+	return a.change
+}
+
 type Addr struct {
 	privateKey ed25519.PrivateKey
 	publicKey  ed25519.PublicKey
 	addrBytes  []byte
+	change     bool
 }
