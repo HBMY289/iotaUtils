@@ -95,11 +95,11 @@ func uint32Bytes(i uint32) []byte {
 
 func GetAddress(masterKey []byte, account, addrIndex uint32, change bool) *addr {
 	a := new(addr)
-	a.path = getPath(account, addrIndex, change)
-	sub := keyWithPath(masterKey, a.path)[:32]
-	a.privateKey = ed25519.NewKeyFromSeed(sub)
-	publicKey := a.privateKey.Public().(ed25519.PublicKey)
-	hash := blake2b.Sum256(publicKey)
+	path := getPath(account, addrIndex, change)
+	subSeed := keyWithPath(masterKey, path)[:32]
+	a.privateKey = ed25519.NewKeyFromSeed(subSeed)
+	a.publicKey = a.privateKey.Public().(ed25519.PublicKey)
+	hash := blake2b.Sum256(a.publicKey)
 	a.addrBytes = hash[:]
 	return a
 }
@@ -120,8 +120,18 @@ func (a addr) Hex() string {
 	return hex.EncodeToString(a.addrBytes)
 }
 
+func (a addr) Sign(message []byte) []byte {
+	sig := ed25519.Sign(a.privateKey, message)
+	return sig
+
+}
+
+func (a addr) Verify(message, signature []byte) bool {
+	return ed25519.Verify(a.publicKey, message, signature)
+}
+
 type addr struct {
-	path       []uint32
 	privateKey ed25519.PrivateKey
+	publicKey  ed25519.PublicKey
 	addrBytes  []byte
 }
