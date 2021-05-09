@@ -18,13 +18,13 @@ var hmacKeyEd25519 = []byte("ed25519 seed")
 const purpose = uint32(44)
 const coinType = uint32(4218)
 
-func SeedFromMnemonic(mnemonic string) []byte {
-	seed := bip39.NewSeed(mnemonic, "")
+func SeedFromMnemonic(mnemonic string, password string) []byte {
+	seed := bip39.NewSeed(mnemonic, password)
 	return seed
 }
 
-func subSeed(M []byte, path []uint32) []byte {
-	key := keyWithPath(M, path)
+func subSeed(masterKey []byte, path []uint32) []byte {
+	key := keyWithPath(masterKey, path)
 	return key[:32]
 }
 
@@ -35,15 +35,15 @@ func getPath(account, addrIndex uint32, change bool) []uint32 {
 	}
 	return path
 }
-func keyWithPath(M []byte, path []uint32) []byte {
-	I := M
+func keyWithPath(masterKey []byte, path []uint32) []byte {
+	I := masterKey
 	for _, i := range path {
 		I = childKey(I, i)
 	}
 	return I
 }
 
-func masterKey(seed []byte) []byte {
+func MasterKey(seed []byte) []byte {
 	hmac := hmac.New(sha512.New, hmacKeyEd25519)
 	_, err := hmac.Write(seed)
 	if err != nil {
