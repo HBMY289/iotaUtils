@@ -145,6 +145,25 @@ func (a Addr) VerboseIndex() string {
 	return index
 }
 
+func ParseVerboseIndex(input string) (uint32, bool, bool) {
+	var change bool
+	if len(input) == 0 {
+		return 0, false, false
+	}
+	if input[:1] == "#" {
+		input = input[1:]
+	}
+	if input[len(input)-1:] == "c" {
+		change = true
+		input = input[:len(input)-1]
+	}
+	num, err := strconv.ParseUint(input, 10, 32)
+	if err == nil {
+		return uint32(num), change, true
+	}
+	return 0, false, false
+}
+
 type Addr struct {
 	privateKey ed25519.PrivateKey
 	publicKey  ed25519.PublicKey
